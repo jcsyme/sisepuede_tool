@@ -19,7 +19,6 @@ class NavItem:
 
 
 _ICON_BASELINE = '<path d="M4 4h16v4H4z"/><path d="M4 12h16v8H4z"/><path d="M9 16h6"/>'
-_ICON_PROJECTS = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'
 _ICON_TRANSFORMATIONS = '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/>'
 _ICON_STRATEGIES = '<circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="12" r="2.4"/><path d="M6 8.4V15.6M8.2 6.9 15.8 10.9M8.2 17.1 15.8 13.1"/>'
 _ICON_RUN = '<path d="M7 4.5v15l13-7.5z"/>'
@@ -45,13 +44,6 @@ NAV_ITEMS: List[NavItem] = [
         group="Setup",
         icon_svg=_svg(_ICON_BASELINE),
         description="Load and validate the emissions baseline that every scenario in this project builds from.",
-    ),
-    NavItem(
-        id="projects",
-        label="Define Projects",
-        group="Define Pathways",
-        icon_svg=_svg(_ICON_PROJECTS),
-        description="Browse candidate NDC/LTS projects and mark which ones are in scope.",
     ),
     NavItem(
         id="transformations",

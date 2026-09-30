@@ -11,7 +11,7 @@ relative to it, not absolute values for it.
 
 import pandas as pd
 import plotly.express as px
-from shiny import module, reactive, render, ui
+from shiny import module, reactive, ui
 from shinywidgets import output_widget, render_plotly
 
 from sisepuede_tool.services import cost_benefit_service
@@ -25,26 +25,18 @@ def page_cost_benefits_ui():
             ui.card_header("Cost and Benefits"),
             ui.p(
                 "Cost/benefit results by strategy and time period, computed from the Run page's "
-                "'Run Selected' action. Choose a baseline to inspect its results.",
+                "'Run Selected' action. Choose a baseline and strategy to inspect results.",
                 class_="text-muted",
             ),
-            ui.input_select("baseline_id", "Baseline", choices={}),
+            ui.layout_columns(
+                ui.input_select("baseline_id", "Baseline", choices={}),
+                ui.input_select("strategy_id", "Strategy", choices={}),
+                col_widths=[6, 6],
+            ),
         ),
         ui.card(
             ui.card_header("Cost/Benefit by Category"),
-            ui.input_select("strategy_id", "Strategy", choices={}),
             output_widget("cba_chart"),
-        ),
-        ui.layout_columns(
-            ui.card(
-                ui.card_header("Cost/Benefit Results"),
-                ui.output_data_frame("cb_results_table"),
-            ),
-            ui.card(
-                ui.card_header("Variable Attributes"),
-                ui.output_data_frame("cb_attr_variable_table"),
-            ),
-            col_widths=[6, 6],
         ),
     )
 
@@ -54,9 +46,13 @@ def page_cost_benefits_server(input, output, session, state: AppState):
     @reactive.effect
     def _sync_baseline_choices():
         cb_results = state.cb_results.get()
-        choices = list(cb_results.keys())
+        baselines = state.baselines.get()
+        choices = {
+            baseline_id: baselines[baseline_id].label if baseline_id in baselines else baseline_id
+            for baseline_id in cb_results.keys()
+        }
         current = input.baseline_id() if "baseline_id" in input else None
-        selected = current if current in choices else (choices[0] if choices else None)
+        selected = current if current in choices else (next(iter(choices), None))
         ui.update_select("baseline_id", choices=choices, selected=selected)
 
     def _current_results():
@@ -104,19 +100,3 @@ def page_cost_benefits_server(input, output, session, state: AppState):
         fig = px.bar(long, x="time_period", y="value", color="category", barmode="relative")
         fig.update_layout(legend_title_text="Category")
         return fig
-
-    @render.data_frame
-    def cb_results_table():
-        results = _current_results()
-        if results is None:
-            return render.DataGrid(pd.DataFrame())
-        df_cb, _df_attr_variable = results
-        return render.DataGrid(df_cb, height="400px")
-
-    @render.data_frame
-    def cb_attr_variable_table():
-        results = _current_results()
-        if results is None:
-            return render.DataGrid(pd.DataFrame())
-        _df_cb, df_attr_variable = results
-        return render.DataGrid(df_attr_variable, height="400px")

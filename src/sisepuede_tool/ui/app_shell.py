@@ -29,7 +29,6 @@ from sisepuede_tool.ui.page_output_explorer import (
     page_output_explorer_ui,
 )
 from sisepuede_tool.ui.page_save_load import page_save_load_server, page_save_load_ui
-from sisepuede_tool.ui.page_projects import page_projects_server, page_projects_ui
 from sisepuede_tool.ui.page_run import page_run_server, page_run_ui
 from sisepuede_tool.ui.page_strategies import page_strategies_server, page_strategies_ui
 from sisepuede_tool.ui.page_transformations import (
@@ -44,7 +43,6 @@ _THEME_CSS_PATH = pathlib.Path(__file__).resolve().parent.parent / "resources" /
 
 _PAGE_UI_FNS = {
     "data_input": page_data_input_ui,
-    "projects": page_projects_ui,
     "transformations": page_transformations_ui,
     "strategies": page_strategies_ui,
     "run": page_run_ui,
@@ -175,7 +173,6 @@ def server(input, output, session):
     state.cb_wrapper.set(cost_benefit_service.build_cb_wrapper(model_attributes, config.CB_CONFIG_XLSX_PATH))
 
     page_data_input_server("data_input", state)
-    page_projects_server("projects", state)
     page_transformations_server("transformations", state)
     page_strategies_server("strategies", state)
     page_run_server("run", state)

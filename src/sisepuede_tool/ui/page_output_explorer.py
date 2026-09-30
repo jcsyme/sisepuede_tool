@@ -28,6 +28,15 @@ def page_output_explorer_ui():
                     choices={"output": "Output (model results)", "input": "Input (drivers)"},
                     selected="output",
                 ),
+                ui.input_radio_buttons(
+                    "view_mode",
+                    "View",
+                    choices={
+                        "by_strategy": "By strategy (stacked area, all fields per plot)",
+                        "by_field": "By field (line, all strategies per plot)",
+                    },
+                    selected="by_strategy",
+                ),
             ),
             ui.card(
                 ui.card_header("Runs to compare"),
@@ -134,6 +143,21 @@ def page_output_explorer_server(input, output, session, state: AppState):
             return px.line(title="Select a variable and at least one run to compare.")
         df = df.copy()
         df["series"] = df["strategy"] + " x " + df["baseline"]
+        view_mode = input.view_mode() if "view_mode" in input else "by_strategy"
+
+        if view_mode == "by_strategy":
+            n_series = df["series"].nunique()
+            fig = px.area(
+                df,
+                x="time_period",
+                y="value",
+                color="category",
+                facet_col="series" if n_series > 1 else None,
+                facet_col_wrap=3,
+            )
+            fig.update_layout(legend_title_text="Field")
+            return fig
+
         n_categories = df["category"].nunique()
         fig = px.line(
             df,
